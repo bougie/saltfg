@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+import os
+import sys
+import argparse
+import logging
+import glob
+from jinja2 import Environment, FileSystemLoader
+from jinja2.exceptions import TemplateNotFound
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s %(module)s %(message)s',
+    level=logging.INFO)
+logger = logging.getLogger()
+
+
+def render_file(srcdir, dstdir, subdir=None):
+    '''
+
+    :param srcdir: source templates dir
+    :type srcdir: str
+    :param dstdir: destination directory rendered templates
+    :type dstdir: str
+    :param subdir: tuple of (template_subdir, formula_subdir)
+    :type subdir: tuple
+    '''
+    if subdir is not None and isinstance(subdir, tuple):
+        srcdir = os.path.join(srcdir, subdir[0])
+
+    tplenv = Environment(loader=FileSystemLoader(srcdir))
+    for tplfile in glob.iglob(os.path.join(srcdir, '*.*')):
+        tplfile = os.path.relpath(tplfile, srcdir)
+        try:
+            tpl = tplenv.get_template(tplfile)
+        except TemplateNotFound as e:
+            logger.error('unable to find template %s' % tplfile)
+            logger.debug(str(e))
+        else:
+            with open(os.path.join(dstdir, tplfile), 'w') as f:
+                f.write(tpl.render())
+
+
+def main(args=None):
+    '''
+    main processing function
+
+    :params args: command line arguments
+    :return: command line return code
+    :rtype: int
+    '''
+    tpldir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
+    for subdir in [None, ('template', 'toto')]:
+        render_file(tpldir, os.getcwd(), subdir)
+
+    return 0
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='')
+    parser.set_defaults(func=main)
+
+    parser.add_argument(
+        '-l', '--level',
+        choices=['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'])
+    parser.add_argument('-v', '--version', action='version', version='0.1')
+
+    args = parser.parse_args()
+
+    # setting log level according to value specified in command line
+    if hasattr(args, 'level') and args.level is not None:
+        logger.setLevel(getattr(logging, args.level))
+
+    if hasattr(args, 'func'):
+        sys.exit(args.func(args=args))
+    else:
+        # no command name supplied : display help message
+        parser.print_help()

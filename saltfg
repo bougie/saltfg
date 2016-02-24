@@ -58,7 +58,7 @@ def main(name, args=None):
 
     tpldir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
     for subdir in [None, ('template', name)]:
-        render_file(tpldir, os.getcwd(), subdir)
+        render_file(tpldir, getattr(args, 'directory', os.getcwd()), subdir)
 
     return 0
 
@@ -73,6 +73,11 @@ if __name__ == "__main__":
         choices=['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'])
     parser.add_argument('-v', '--version', action='version', version='0.1')
     parser.add_argument('name', help='saltstack formula name', type=str)
+    parser.add_argument(
+        '-d', '--directory',
+        help='path to directory where to create the formula '
+             '(default is current directory)',
+        default=os.getcwd())
 
     args = parser.parse_args()
 

@@ -26,8 +26,9 @@ def render_file(srcdir, dstdir, subdir=None):
     if subdir is not None and isinstance(subdir, tuple):
         srcdir = os.path.join(srcdir, subdir[0])
         dstdir = os.path.join(dstdir, subdir[1])
-        if os.path.exists(dstdir) is False:
-            os.makedirs(dstdir)
+
+    if os.path.exists(dstdir) is False:
+        os.makedirs(dstdir)
 
     tplenv = Environment(loader=FileSystemLoader(srcdir))
     for tplfile in glob.iglob(os.path.join(srcdir, '*.*')):

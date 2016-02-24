@@ -43,16 +43,21 @@ def render_file(srcdir, dstdir, subdir=None):
                 f.write(tpl.render())
 
 
-def main(args=None):
+def main(name, args=None):
     '''
     main processing function
 
-    :params args: command line arguments
+    :param name: name of formula
+    :type name: str
+    :param args: command line arguments
+    :type args: argparse.Namespace
     :return: command line return code
     :rtype: int
     '''
+    logger.info('creating formula %s' % name)
+
     tpldir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
-    for subdir in [None, ('template', 'toto')]:
+    for subdir in [None, ('template', name)]:
         render_file(tpldir, os.getcwd(), subdir)
 
     return 0
@@ -67,6 +72,7 @@ if __name__ == "__main__":
         '-l', '--level',
         choices=['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'])
     parser.add_argument('-v', '--version', action='version', version='0.1')
+    parser.add_argument('name', help='saltstack formula name', type=str)
 
     args = parser.parse_args()
 
@@ -75,7 +81,7 @@ if __name__ == "__main__":
         logger.setLevel(getattr(logging, args.level))
 
     if hasattr(args, 'func'):
-        sys.exit(args.func(args=args))
+        sys.exit(args.func(name=args.name, args=args))
     else:
         # no command name supplied : display help message
         parser.print_help()

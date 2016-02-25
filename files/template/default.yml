@@ -1,0 +1,10 @@
+{%- raw -%}
+{% load_yaml as lookup %}
+default:
+    package: {{name}}
+    service: {{name}}
+{% endload %}
+
+{% load_yaml as rawmap %}
+{% endload %}
+{%- endraw -%}

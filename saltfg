@@ -44,8 +44,13 @@ def render_file(srcdir, dstdir, subdir=None, datas={}):
             logger.error('unknown error while loading template %s' % tplfile)
             logger.debug(str(e))
         else:
+            # need to replace some variables by hand 'cause jinja syntax
+            content = tpl.render(**datas)
+            if 'name' in datas:
+                content = content.replace('{{name}}', datas['name'])
+
             with open(os.path.join(dstdir, tplfile), 'w') as f:
-                f.write(tpl.render(**datas))
+                f.write(content)
 
 
 def main(name, args=None):

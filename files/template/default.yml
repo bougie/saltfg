@@ -1,5 +1,14 @@
 {%- raw -%}
 {% load_yaml as lookup %}
+FreeBSD:
+    package: {{name}}
+    service: {{name}}
+Debian:
+    package: {{name}}
+    service: {{name}}
+CentOS:
+    package: {{name}}
+    service: {{name}}
 default:
     package: {{name}}
     service: {{name}}
@@ -8,3 +17,4 @@ default:
 {% load_yaml as rawmap %}
 {% endload %}
 {%- endraw -%}
+
